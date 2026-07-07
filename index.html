@@ -1,358 +1,56 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Perhitungan di Surat Keterangan Belajar Bahasa Jepang</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-<style>
-body{
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background:linear-gradient(135deg,#1e3c72,#2a5298);
-    padding:30px;
-}
-.card{
-    background:white;
-    border-radius:15px;
-    padding:25px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.2);
-    margin-bottom:30px;
-}
-h1{text-align:center;color:#1e3c72;}
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:15px;
-}
-input{
-    padding:8px;
-    border-radius:8px;
-    border:1px solid #ccc;
-    width:95%;
-    margin-bottom:8px;
-}
-button{
-    padding:10px 18px;
-    background:#1e3c72;
-    color:white;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-}
-button:hover{background:#16305c;}
-
-.result-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
-}
-.result-table th{
-    background:#1e3c72;
-    color:white;
-    padding:12px;
-    text-align:left;
-}
-.result-table td{
-    padding:12px;
-    border-bottom:1px solid #eee;
-}
-.result-table tr:nth-child(even){background:#f9f9f9;}
-
-.days-header{
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
-    text-align:center;
-    font-weight:500;
-    margin-bottom:5px;
-}
-.days{
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
-    gap:5px;
-}
-.day{
-    padding:8px;
-    text-align:center;
-    border-radius:6px;
-    font-size:12px;
-}
-.masuk{background:#27ae60;color:white;}
-.libur{background:#e74c3c;color:white;}
-.alfa{background:#f39c12;color:white;}
-.sisa{background:#3498db;color:white;}
-.nonaktif{background:#ecf0f1;}
-.legend{
-    margin-top:10px;
-    font-size:13px;
-    padding:10px;
-    background:#f4f6f9;
-    border-radius:8px;
-}
-
-/* UI Hari Belajar */
-.hari-group{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-    gap:10px;
-    margin-top:10px;
-}
-.hari-item{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    background:#f4f6f9;
-    padding:8px 12px;
-    border-radius:8px;
-    cursor:pointer;
-    transition:0.2s;
-}
-.hari-item:hover{background:#dfe6f3;}
-.hari-item input{width:16px;height:16px;}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ogg-id.github.io</title>
+  <link rel="icon" href="ogg-id.ico" type="image/x-icon">
+  <style>
+    body { margin:24px; font:15px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    a { color:inherit; text-decoration:none } a:hover{ text-decoration:underline }
+    .line { white-space:pre }
+  </style>
 </head>
-
 <body>
+  <div id="root" class="line">📚 <strong>ogg-id.github.io</strong></div>
+  <div id="list" class="line">memuat…</div>
 
-<div class="card">
-<h1>Perhitungan di Surat Keterangan Belajar Bahasa Jepang</h1>
+  <script>
+    const USER = "ogg-id";
+    const BASE = `https://${USER}.github.io`;
 
-<div class="grid">
-<div>
-<label>Tanggal Mulai Program</label>
-<input type="date" id="startDate">
-</div>
-<div>
-<label>Tanggal Sudah Selesai Belajar</label>
-<input type="date" id="finishDate">
-</div>
-<div>
-<label>Tanggal Rencana Akhir Program</label>
-<input type="date" id="endDate">
-</div>
-<div>
-<label>Jam per Hari</label>
-<input type="number" id="hoursPerDay" value="2">
-</div>
-</div>
-
-<br>
-
-<label>Hari Belajar:</label>
-<div class="hari-group">
-  <label class="hari-item"><input type="checkbox" value="1"><span>Senin</span></label>
-  <label class="hari-item"><input type="checkbox" value="2"><span>Selasa</span></label>
-  <label class="hari-item"><input type="checkbox" value="3"><span>Rabu</span></label>
-  <label class="hari-item"><input type="checkbox" value="4"><span>Kamis</span></label>
-  <label class="hari-item"><input type="checkbox" value="5"><span>Jumat</span></label>
-  <label class="hari-item"><input type="checkbox" value="6"><span>Sabtu</span></label>
-  <label class="hari-item"><input type="checkbox" value="0"><span>Minggu</span></label>
-</div>
-
-<br><br>
-
-<label>Tambah Hari Libur</label>
-<input type="date" id="holidayDate">
-<input type="text" id="holidayName" placeholder="Nama Hari Libur">
-<button type="button" onclick="addHoliday()">Tambah</button>
-<div id="holidayContainer"></div>
-
-<br>
-
-<label>Tambah Alfa</label>
-<input type="date" id="absentDate">
-<button type="button" onclick="addAbsent()">Tambah</button>
-<div id="absentContainer"></div>
-
-<br>
-<button type="button" onclick="generateAll()">Hitung & Tampilkan</button>
-
-</div>
-
-<div class="card">
-<div id="resultArea"></div>
-</div>
-
-<div class="card">
-<div id="calendarArea"></div>
-</div>
-
-<footer style="justify-self: center;">
-  OGG Staf Indonesia | 
-  Versi 2026.03.01
-</footer>
-
-<script>
-
-function parseLocalDate(value){
-    const parts=value.split("-");
-    return new Date(parts[0], parts[1]-1, parts[2]);
-}
-
-function formatDate(date){
-    return date.getFullYear()+"-"+
-    String(date.getMonth()+1).padStart(2,"0")+"-"+
-    String(date.getDate()).padStart(2,"0");
-}
-
-let holidays=[];
-let absents=[];
-
-function addHoliday(){
-    const date=document.getElementById("holidayDate").value;
-    const name=document.getElementById("holidayName").value;
-    if(date && name){
-        holidays.push({date,name});
-        document.getElementById("holidayContainer").innerHTML+=
-        `<div>🔴 ${date} : ${name}</div>`;
-        document.getElementById("holidayName").value="";
+    async function gh(url){
+      const r = await fetch(url, { headers: { "Accept":"application/vnd.github+json" }});
+      if(!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
     }
-}
+    function branch(i, n){ return (i === n - 1) ? "└── " : "├── "; }
 
-function addAbsent(){
-    const date=document.getElementById("absentDate").value;
-    if(date){
-        absents.push(date);
-        document.getElementById("absentContainer").innerHTML+=
-        `<div>🟠 ${date}</div>`;
-    }
-}
+    (async function render(){
+      const el = document.getElementById("list");
+      try{
+        // Ambil sampai 100 repo milik user, lalu filter yang has_pages = true
+        const repos = await gh(`https://api.github.com/users/${USER}/repos?per_page=100&type=owner`);
+        const live = repos
+          .filter(r => r.has_pages && r.name.toLowerCase() !== `${USER}.github.io`) // exclude user-site repo
+          .map(r => r.name)
+          .sort((a,b)=> a.localeCompare(b)); // urut alfabet
 
-function generateAll(){
-    generateSummary();
-    generateCalendar();
-}
-
-function generateSummary(){
-
-    const start=parseLocalDate(document.getElementById("startDate").value);
-    const finish=parseLocalDate(document.getElementById("finishDate").value);
-    const end=parseLocalDate(document.getElementById("endDate").value);
-    const hoursPerDay=parseFloat(document.getElementById("hoursPerDay").value);
-
-    const checkedDays=Array.from(document.querySelectorAll(".hari-item input:checked"))
-    .map(cb=>parseInt(cb.value));
-
-    let totalAll=0;
-    let totalDone=0;
-    let alfaCount=0;
-
-    for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
-        const str=formatDate(d);
-        const isHoliday=holidays.some(h=>h.date===str);
-        const isAbsent=absents.includes(str);
-
-        if(checkedDays.includes(d.getDay()) && !isHoliday){
-            totalAll++;
-            if(isAbsent) alfaCount++;
-            else if(d<=finish) totalDone++;
-        }
-    }
-
-    const totalRemain=totalAll-totalDone-alfaCount;
-
-    const narasi=`
-    <p style="margin-top:20px; line-height:1.6;">
-    Sampai dengan tanggal <strong>${formatDate(finish)}</strong>, 
-    siswa telah mengikuti pembelajaran selama 
-    <strong>${totalDone} hari</strong> atau 
-    <strong>${totalDone*hoursPerDay} jam</strong> 
-    dari total keseluruhan program 
-    <strong>${totalAll} hari</strong> atau 
-    <strong>${totalAll*hoursPerDay} jam</strong>. 
-    Sisa pembelajaran adalah 
-    <strong>${totalRemain} hari</strong> atau 
-    <strong>${totalRemain*hoursPerDay} jam</strong>.
-    </p>
-    `;
-
-    document.getElementById("resultArea").innerHTML=`
-    <table class="result-table">
-    <tr><th colspan="2">Rincian Program Pembelajaran</th></tr>
-    <tr><td>Periode Sudah Belajar</td><td>${formatDate(start)} s/d ${formatDate(finish)}</td></tr>
-    <tr><td>Periode Program Keseluruhan</td><td>${formatDate(start)} s/d ${formatDate(end)}</td></tr>
-    <tr><td>Total Hari Masuk / Total Jam Efektif</td><td><strong>${totalDone} hari / ${totalDone*hoursPerDay} jam</strong></td></tr>
-    <tr><td>Total Alfa</td><td><strong>${alfaCount} hari</strong></td></tr>
-    <tr><td>Total Libur</td><td><strong>${holidays.length} hari</strong></td></tr>
-    <tr><td>Sisa Belajar</td><td><strong>${totalRemain} hari / ${totalRemain*hoursPerDay} jam</strong></td></tr>
-    <tr><td>Total Program</td><td><strong>${totalAll} hari / ${totalAll*hoursPerDay} jam</strong></td></tr>
-    </table>
-    ${narasi}
-    `;
-}
-
-function generateCalendar(){
-
-    const start=parseLocalDate(document.getElementById("startDate").value);
-    const finish=parseLocalDate(document.getElementById("finishDate").value);
-    const end=parseLocalDate(document.getElementById("endDate").value);
-
-    const checkedDays=Array.from(document.querySelectorAll(".hari-item input:checked"))
-    .map(cb=>parseInt(cb.value));
-
-    const hari=["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
-
-    let calendarHTML="";
-    let current=new Date(start.getFullYear(),start.getMonth(),1);
-
-    while(current<=end){
-
-        const month=current.getMonth();
-        const year=current.getFullYear();
-        const firstDay=new Date(year,month,1).getDay();
-        const daysInMonth=new Date(year,month+1,0).getDate();
-
-        calendarHTML+=`<div style="margin-bottom:40px;">
-        <h3>${current.toLocaleString('id-ID',{month:'long'})} ${year}</h3>
-        <div class="days-header">${hari.map(h=>`<div>${h}</div>`).join("")}</div>
-        <div class="days">`;
-
-        for(let i=0;i<firstDay;i++){ calendarHTML+=`<div></div>`; }
-
-        for(let i=1;i<=daysInMonth;i++){
-            const date=new Date(year,month,i);
-            const str=formatDate(date);
-            let className="nonaktif";
-
-			if(date>=start && date<=end){
-
-				if(holidays.some(h=>h.date===str)){
-					className="libur";
-				}
-				else if(absents.includes(str)){
-					className="alfa";
-				}
-				else if(checkedDays.includes(date.getDay())){
-					if(date<=finish){
-						className="masuk";      // sudah dijalani
-					} else {
-						className="sisa";       // belum dijalani (sisa belajar)
-					}
-				}
-			}
-
-            calendarHTML+=`<div class="day ${className}">${i}</div>`;
+        if(!live.length){
+          el.textContent = "(belum ada Project Pages aktif)";
+          return;
         }
 
-        calendarHTML+=`</div><div class="legend">`;
-
-        holidays.filter(h=>parseLocalDate(h.date).getMonth()===month)
-        .forEach(h=>calendarHTML+=`<div>🔴 ${h.date} : ${h.name}</div>`);
-
-        absents.filter(a=>parseLocalDate(a).getMonth()===month)
-        .forEach(a=>calendarHTML+=`<div>🟠 ${a} : Alfa</div>`);
-
-        calendarHTML+=`</div></div>`;
-
-        current=new Date(year,month+1,1);
-    }
-
-    document.getElementById("calendarArea").innerHTML=calendarHTML;
-}
-
-</script>
-
+        // Bentuk tree sederhana
+        const lines = live.map((name, i) =>
+          `${branch(i, live.length)}📂<a href="${BASE}/${encodeURIComponent(name)}/">${name}/</a>`
+        );
+        el.innerHTML = lines.join("\n");
+      }catch(e){
+        document.getElementById("root").textContent = "📚 ogg-id.github.io";
+        el.textContent = `❌ Gagal memuat (${e.message})`;
+      }
+    })();
+  </script>
 </body>
 </html>
