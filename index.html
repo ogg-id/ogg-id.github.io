@@ -9,48 +9,125 @@
     body { margin:24px; font:15px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
     a { color:inherit; text-decoration:none } a:hover{ text-decoration:underline }
     .line { white-space:pre }
+
+    /* ---- Login styles ---- */
+    #loginScreen {
+      max-width: 340px;
+      margin: 80px auto 0;
+      text-align: center;
+    }
+    #loginScreen h2 { margin-bottom: 4px; }
+    #loginScreen p.hint {
+      font-size: 13px;
+      color: #666;
+      margin-top: 6px;
+    }
+    #loginScreen input {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      margin: 8px 0;
+      font: inherit;
+      border: 1px solid #999;
+      border-radius: 4px;
+    }
+    #loginScreen button {
+      width: 100%;
+      padding: 8px 10px;
+      font: inherit;
+      border: 1px solid #333;
+      border-radius: 4px;
+      background: #111;
+      color: #fff;
+      cursor: pointer;
+    }
+    #loginScreen button:hover { background: #333; }
+    #loginError {
+      color: #c0392b;
+      font-size: 13px;
+      min-height: 18px;
+      margin-top: 6px;
+    }
+    #appScreen { display: none; }
   </style>
 </head>
 <body>
-  <div id="root" class="line">📚 <strong>ogg-id.github.io</strong></div>
-  <div id="list" class="line">memuat…</div>
+
+  <!-- ================= LOGIN SCREEN ================= -->
+  <div id="loginScreen">
+    <h2>🔒 Login</h2>
+    <input id="userInput" type="text" placeholder="Username" autocomplete="username" />
+    <input id="passInput" type="password" placeholder="Password" autocomplete="current-password" />
+    <button id="loginBtn">Masuk</button>
+    <div id="loginError"></div>
+    <p class="hint">Hint: <em id="passHint">OGG/nama negara kita 🇮🇩</em></p>
+  </div>
+
+  <!-- ================= MAIN APP (ORIGINAL PAGE) ================= -->
+  <div id="appScreen">
+    <div id="root" class="line">📚 <strong>ogg-id.github.io</strong></div>
+    <div id="list" class="line">memuat…</div>
+  </div>
 
   <script>
-    const USER = "ogg-id";
-    const BASE = `https://${USER}.github.io`;
+    // ====== KONFIGURASI LOGIN (ubah sesuai kebutuhanmu) ======
+    const VALID_USER = "OGG";
+    const VALID_PASS = "Indonesia";
 
-    async function gh(url){
-      const r = await fetch(url, { headers: { "Accept":"application/vnd.github+json" }});
-      if(!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.json();
-    }
-    function branch(i, n){ return (i === n - 1) ? "└── " : "├── "; }
+    const loginScreen = document.getElementById("loginScreen");
+    const appScreen   = document.getElementById("appScreen");
+    const loginBtn    = document.getElementById("loginBtn");
+    const userInput   = document.getElementById("userInput");
+    const passInput   = document.getElementById("passInput");
+    const loginError  = document.getElementById("loginError");
 
-    (async function render(){
-      const el = document.getElementById("list");
-      try{
-        // Ambil sampai 100 repo milik user, lalu filter yang has_pages = true
-        const repos = await gh(`https://api.github.com/users/${USER}/repos?per_page=100&type=owner`);
-        const live = repos
-          .filter(r => r.has_pages && r.name.toLowerCase() !== `${USER}.github.io`) // exclude user-site repo
-          .map(r => r.name)
-          .sort((a,b)=> a.localeCompare(b)); // urut alfabet
-
-        if(!live.length){
-          el.textContent = "(belum ada Project Pages aktif)";
-          return;
-        }
-
-        // Bentuk tree sederhana
-        const lines = live.map((name, i) =>
-          `${branch(i, live.length)}📂<a href="${BASE}/${encodeURIComponent(name)}/">${name}/</a>`
-        );
-        el.innerHTML = lines.join("\n");
-      }catch(e){
-        document.getElementById("root").textContent = "📚 ogg-id.github.io";
-        el.textContent = `❌ Gagal memuat (${e.message})`;
+    function tryLogin(){
+      if(userInput.value === VALID_USER && passInput.value === VALID_PASS){
+        loginScreen.style.display = "none";
+        appScreen.style.display = "block";
+        initApp(); // baru jalankan fetch daftar repo setelah login sukses
+      } else {
+        loginError.textContent = "Username atau password salah.";
       }
-    })();
+    }
+
+    loginBtn.addEventListener("click", tryLogin);
+    passInput.addEventListener("keydown", (e) => { if(e.key === "Enter") tryLogin(); });
+    userInput.addEventListener("keydown", (e) => { if(e.key === "Enter") tryLogin(); });
+
+    // ====== KODE ASLI (daftar repo GitHub Pages) ======
+    function initApp(){
+      const USER = "ogg-id";
+      const BASE = `https://${USER}.github.io`;
+      async function gh(url){
+        const r = await fetch(url, { headers: { "Accept":"application/vnd.github+json" }});
+        if(!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      }
+      function branch(i, n){ return (i === n - 1) ? "└── " : "├── "; }
+      (async function render(){
+        const el = document.getElementById("list");
+        try{
+          const repos = await gh(`https://api.github.com/users/${USER}/repos?per_page=100&type=owner`);
+          const live = repos
+            .filter(r => r.has_pages && r.name.toLowerCase() !== `${USER}.github.io`)
+            .map(r => r.name)
+            .sort((a,b)=> a.localeCompare(b));
+          if(!live.length){
+            el.textContent = "(belum ada Project Pages aktif)";
+            return;
+          }
+          const lines = live.map((name, i) =>
+            `${branch(i, live.length)}📂<a href="${BASE}/${encodeURIComponent(name)}/">${name}/</a>`
+          );
+          el.innerHTML = lines.join("\n");
+        }catch(e){
+          document.getElementById("root").textContent = "📚 ogg-id.github.io";
+          el.textContent = `❌ Gagal memuat (${e.message})`;
+        }
+      })();
+    }
   </script>
 </body>
 </html>
